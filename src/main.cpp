@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 #include "jsonxx/jsonxx.h"
+#include "curl/include/curl/curl.h"
 
 template<typename Ts=std::string>
 void pause(const Ts& text=std::string("")) {
@@ -37,12 +38,86 @@ std::string generateRandomString(const size_t len) {
 	return result;
 }
 
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+	size_t totalSize = size * nmemb;
+	output->append((char*)contents, totalSize);
+	return totalSize;
+}
+
+std::string getJsonFromWebApi(const std::string& url) {
+	CURL* curl = curl_easy_init();
+	if (!curl) {
+		std::cerr << "curl_easy_init failed" << std::endl;
+		return "-1";
+	}
+
+	std::string responseBody;
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "SimpleIDLottery/1.0");
+
+	CURLcode res = curl_easy_perform(curl);
+	if (res != CURLE_OK) {
+		std::cerr << "curl_easy_perform failed: " << curl_easy_strerror(res) << std::endl;
+		curl_easy_cleanup(curl);
+		return "-1";
+	}
+
+	long http_code = 0;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+	if (http_code != 200) {
+		std::cerr << "HTTP status code: " << http_code << std::endl;
+		curl_easy_cleanup(curl);
+		return "-1";
+	}
+
+	curl_easy_cleanup(curl);
+	return responseBody;
+}
+
+enum class inputMode {
+	Local=1,
+	WebApi
+};
+
 int main() {
 	std::string currentFile("init");
+	size_t inputMode=static_cast<size_t>(inputMode::Local);
+
 	while (true) {
-		std::cout<<"Please input the required file name in the new line, directly press enter to exit the program"<<std::endl;
-		std::getline(std::cin,currentFile);
-		if (currentFile.empty()) exit(0);
+		std::cout<<"Welcome to Simple ID Lottery, please choose input mode:"<<std::endl
+		<<"1. Local File Input"<<std::endl
+		<<"2. Web API Input"<<std::endl;
+		std::cin>>inputMode;
+		switch (inputMode){
+			case 1: {
+				std::cout<<"Please input the required file name in the new line, directly press enter to exit the program"<<std::endl;
+				std::cin>>currentFile;
+				if (currentFile.empty()) exit(0);
+				break;
+			}
+			case 2: {
+				std::string url, fileName;
+				std::cout<<"Please input the Web API URL: ";
+				std::cin>>url;
+				std::cout<<"Please input the required file name: ";
+				std::cin>>fileName;
+				std::ofstream outFile(fileName);
+				outFile << getJsonFromWebApi(url);
+				outFile.close();
+				currentFile = fileName;
+				break;
+			}
+			default: {
+				std::cout<<"Invalid input mode! Please input again!"<<std::endl;
+				continue;
+			}
+		}
+
 		std::ifstream textData(currentFile);
 		if (!textData) {
 			std::cerr << "Error when opening the data file!";
@@ -157,7 +232,7 @@ int main() {
 		}
 
 		pause("Rolls Over! The id of the rolling round is"+randomString+", Press Any Key to start another round");
-		system("cls");
 	}
+	curl_global_cleanup();
 	return 0;
 }
