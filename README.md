@@ -4,16 +4,20 @@
 > - CPP构建的轻量抽奖工具
 > - 支持本地Json文件或Web Json API输入
 
+
+> **温馨提示**：**_本项目尚未完善异常处理和对Linux端完全支持_**
+
 ## 功能
 - 本地JSON文件输入 格式为字符串数组 `["@A" "@B"]`
 - Web API输入 自动请求URL并保存为临时文件
 - 多轮抽奖 每轮可设不同中奖人数
+- 采用mt19937随机数生成器，确保公平性
 - 可选每轮后删除已中奖用户
 - 可选逐步展示结果或一次性输出
 - 自动保存每轮抽奖记录到 `results/随机ID/` 目录
 
 ## 建议构建要求
-- CMake 3.31+
+- CMake 3.28+
 - C++14及以上编译器
 - libcurl 静态库
 - jsonxx 头文件库
@@ -24,9 +28,9 @@ git clone https://github.com/CCA8798/Simple_ID_Lottery.git
 
 cd Simple_ID_Lottery
 
-mkdir build && cd build
-
-cmake .. -DCURL_STATICLIB=ON
+git submodule update --init --recursive
+ 
+cmake -DCURL_STATICLIB=ON
 
 cmake --build .
 ```
