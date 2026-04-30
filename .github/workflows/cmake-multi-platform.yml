@@ -1,0 +1,41 @@
+name: CMake on Linux
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            c_compiler: gcc
+            cpp_compiler: g++
+          - compiler: clang
+            c_compiler: clang
+            cpp_compiler: clang++
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install libcurl
+      run: sudo apt update && sudo apt install -y libcurl4-openssl-dev
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCURL_STATICLIB=ON
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Verify executable
+      run: test -f build/Simple_ID_Lottery
