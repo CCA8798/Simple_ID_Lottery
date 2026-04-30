@@ -1,3 +1,6 @@
 [submodule "libs/curl"]
 	path = libs/curl
 	url = https://github.com/curl/curl
+[submodule "include/jsonxx"]
+	path = include/jsonxx
+	url = https://github.com/hjiang/jsonxx
