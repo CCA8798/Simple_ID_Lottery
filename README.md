@@ -1,6 +1,6 @@
 # Simple ID Lottery
 ![C++17](https://img.shields.io/badge/C%2B%2B_Version-14+-blue.svg)
-
+![MIT License](https://img.shields.io/badge/License-MIT-green.svg)
 > - CPP构建的轻量抽奖工具
 > - 支持本地Json文件或Web Json API输入
 
@@ -12,7 +12,7 @@
 - 可选逐步展示结果或一次性输出
 - 自动保存每轮抽奖记录到 `results/随机ID/` 目录
 
-## 构建要求
+## 建议构建要求
 - CMake 3.31+
 - C++14及以上编译器
 - libcurl 静态库
@@ -20,15 +20,19 @@
 
 ## 快速构建
 ```bash
-git clone <your-repo>
+git clone https://github.com/CCA8798/Simple_ID_Lottery.git
+
 cd Simple_ID_Lottery
+
 mkdir build && cd build
+
 cmake .. -DCURL_STATICLIB=ON
+
 cmake --build .
 ```
 
 ## 使用
-运行程序后按提示选择输入模式 本地需提供JSON文件路径 Web模式需输入API URL和保存文件名
+运行程序后按提示选择输入模式 本地需提供JSON文件路径 Web模式需输入URL和临时文件名
 
 抽奖记录保存于 `results/` 文件夹 每次运行生成随机子目录
 
