@@ -2,9 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/include/HTTPRequest" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/include/HTTPRequest/external/Catch2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/include/curl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/include/jsonxx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libs/curl" vcs="Git" />
   </component>
 </project>
